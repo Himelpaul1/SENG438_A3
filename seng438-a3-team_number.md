@@ -1,0 +1,479 @@
+**SENG 438 - Software Testing, Reliability, and Quality**
+
+**Lab. Report #3 – Code Coverage, Adequacy Criteria and Test Case Correlation**
+
+| Group \#:      |  23  |
+| -------------- | --- |
+| Student Names: |     |
+| M Munem Morhsed |     |
+| Himel Paul |     |
+| SM Wahid Chowdhury |     |
+| Adrita Chowdhury Maliha |     |
+| Kosy Onyejemezi |     |
+
+(Note that some labs require individual reports while others require one report
+for each group. Please see each lab document for details.)
+
+# 1 Introduction
+
+The following lab report will be showing information on assignment 3. The assignment focuses on JUnit testing and how to improve the previous assignment with better tests that lead to more coverage of the code. Discussions about the complexity analysis are included.
+
+# 2 Manual data-flow coverage calculations for X and Y methods
+
+- Range.constain()
+
+![3AD610AD-2A0C-43DB-A932-5D51AEB45108](https://github.com/user-attachments/assets/5c532fb9-7334-4e38-b9ec-e0138c341d11)
+
+| Variables |Pairs (def, use) |
+| ----------- | ------------------------------ |
+| value | (1, 2), (1, 3), (1, 4), (1, 7) |
+| result | (2, 11), (5, 11), (8, 11) |
+| this.upper | (0, 4), (0, 5) |
+| this.lower | (0, 7), (0, 8) |
+
+Pairs Covered:
+
+testCalculateColumnTotal(): Covers (5,6), (5,7), (5,8)
+
+testCalculateRowTotal(): Covers (7,8), (7,9), (7,10)
+
+testCreateNumberArray(): Covers (9,10), (9,11)
+
+testCreateNumberArray2D(): Covers (11,12), (11,13)
+
+testGetCumulativePercentages(): Covers (13,14), (13,15), (13,16)
+
+Coverage = (number of excercised du pairs/ total number of du pairs) * 100  =  100%
+
+
+
+- DataUtilities.calculateColumnTotal()
+
+![82E51694-0F76-4D1E-8944-6EE32F30BBBF](https://github.com/user-attachments/assets/41ee4645-adb1-4263-bdd7-b0cc67d8d2a3)
+
+  
+| Variables |Pairs (def, use) |
+| ----------- | ------------------------------ |
+| equal | (1, 2), (1, 3), (1, 4), (1, 5) |
+| clone | (2, 3), (2, 4), (2, 5) |
+| calculateColunmTotal | (3, 4), (3, 5), (3, 6) |
+| calculateNumberArray | (5, 6), (5, 7) |
+| createNumberArray2D | (6, 7), (6, 8) |
+| getCumulativePercentages | (7, 8), (7, 9) |
+| calculateRowTotal | (4, 5), (4, 6), (4, 7) |
+
+Pairs Covered:
+
+
+testEqual_BothNull(): Covers (1, 2)
+
+testEqual_FirstArrayNull(): Covers (1, 3)
+
+testEqual_SecondArrayNull(): Covers (1, 4)
+
+testEqual_DifferentLengths(): Covers (1, 5)
+
+testCloneWithValidInput(): Covers (2, 3)
+
+testCloneWithEmptyArray(): Covers (2, 4)
+
+testCloneWithNullRows(): Covers (2, 5)
+
+testCalculateColumnTotal(): Covers (3, 4)
+
+testCalculateColumnTotal_WithEmptyTable(): Covers (3, 5)
+
+testCalculateColumnTotal_NullValuesInData(): Covers (3, 6)
+
+testCalculateRowTotal_WithValues(): Covers (4, 5)
+
+testCalculateRowTotal_NullValue() Covers (4, 6)
+
+testCalculateRowTotal_EmptyDataTable(): Covers (4, 7)
+
+testCreateNumberArray_WithData(): Covers (5, 6)
+
+testCreateNumberArray_EmptyArray(): Covers (5, 7)
+
+testCreateNumberArray2D_WithData(): Covers (6, 7)
+
+testCreateNumberArray2D_EmptyArray(): Covers (6, 8)
+
+testGetCumulativePercentages_NormalCase(): Covers (7, 8)
+
+testGetCumulativePercentages_NullValues(): Covers (7, 9)
+
+
+Coverage = (number of excercised du pairs/ total number of du pairs) * 100  =  100%
+
+# 3 A detailed description of the testing strategy for the new unit test
+
+We first began by examining the current code coverage achieved by our black box unit tests from Assignment 2. We then tackled statement coverage first. Using EclEmma, we were able to see which lines of the source code for Range and DataUtilities were being executed by our existing tests. From there, we examined the control flow structure of the different methods. We wrote unit tests according to the documentation, incorporating cases that will trigger different control flow blocks to reach code that was not reached by our original tests. Additionally, DataUtilities got four new methods in the new version of the code. These were obviously not covered by our existing test suite, so we were able to increase our statement coverage significantly by writing basic tests for those new methods. After reaching our statement coverage goals, we then turned to branch coverage. Our efforts to meet statement coverage goals also increased out branch coverage significantly, but not quite to the appropriate level. We examined which branch directions were covered by our existing statement coverage tests, and then wrote tests according to the documentation to make the control flow statement evaluate to true if the previous test made it false, and vice-versa. Writing a few of these tests for each method in Range and DataUtilities increased our branch coverage to above the required level. Finally, since EclEmma does not have condition coverage capabilities, we used method coverage for our last metric as suggested in the lab manual. Our efforts increasing coverage in the other two metrics meant that we wrote tests for each method, and thus our method coverage was 100%. In general, our strategy was to first read and understand the code and its control flow. We then wrote tests to exercise different parts of the code according to those control flow structures in order to achieve our goal coverages.
+
+# 4 A high level description of five selected test cases you have designed using coverage information, and how they have increased code coverage
+
+1. clone()
+-Initially, the method lacked boundary and null cases. Added test cases for valid null input, with empty array, and null rows. The branch coverage for this method  was improved to 100%, so it automatically makes the statement coveage to 100%.
+
+@Test
+    public void testCloneWithValidInput() {
+        double[][] source = {{1.0, 2.0}, {3.0, 4.0}};
+        double[][] result = DataUtilities.clone(source);  
+        assertNotSame(source, result);
+        assertEquals(source.length, result.length); 
+        for (int i = 0; i < source.length; i++) {
+            assertNotSame(source[i], result[i]);
+            assertArrayEquals(source[i], result[i], 0.0001);
+        }
+    }
+
+  @Test
+    public void testCloneWithEmptyArray() {
+        double[][] source = {};
+        double[][] result = DataUtilities.clone(source);  
+        assertNotSame(source, result);
+        assertEquals(0, result.length);
+    }
+
+  @Test
+    public void testCloneWithNullRows() {
+        double[][] source = new double[2][];
+        source[0] = new double[]{1.0, 2.0};
+        source[1] = null; 
+        double[][] result = DataUtilities.clone(source);
+        assertNotSame(source, result);
+        assertEquals(source.length, result.length);
+        assertArrayEquals(source[0], result[0], 0.0001);
+        assertNull(result[1]);
+    }
+
+
+2. getCumulativePercentages()
+-Included tests with normal values, empty datasets, null values, and negative values. This increased coverage of statement 100% and the coverage of branch 91.7%.
+
+
+@Test
+   public void testGetCumulativePercentages_NormalCase() {
+       DefaultKeyedValues data = new DefaultKeyedValues();
+       data.addValue("A", 1.0);
+       data.addValue("B", 2.0);
+       data.addValue("C", 3.0);
+       KeyedValues result = DataUtilities.getCumulativePercentages(data);
+       assertEquals("Cumulative % for A", 1.0 / 6.0, result.getValue("A").doubleValue(), 0.0001);
+       assertEquals("Cumulative % for B", 3.0 / 6.0, result.getValue("B").doubleValue(), 0.0001);
+       assertEquals("Cumulative % for C", 6.0 / 6.0, result.getValue("C").doubleValue(), 0.0001);
+   }
+
+@Test
+   public void testGetCumulativePercentages_EmptyDataset() {
+       DefaultKeyedValues data = new DefaultKeyedValues();
+       KeyedValues result = DataUtilities.getCumulativePercentages(data);
+       assertEquals("Empty dataset should return empty KeyedValues", 0, result.getItemCount());
+   }
+
+@Test
+   public void testGetCumulativePercentages_NullValues() {
+       DefaultKeyedValues data = new DefaultKeyedValues();
+       data.addValue("A", 2.0);
+       data.addValue("B", null);
+       data.addValue("C", 3.0);
+       KeyedValues result = DataUtilities.getCumulativePercentages(data);
+       assertEquals("Cumulative % for A", 2.0 / 5.0, result.getValue("A").doubleValue(), 0.0001);
+       assertEquals("Cumulative % for C", 5.0 / 5.0, result.getValue("C").doubleValue(), 0.0001);
+   }
+ @Test
+   public void testGetCumulativePercentages_SingleValue() {
+       DefaultKeyedValues data = new DefaultKeyedValues();
+       data.addValue("A", 10.0);
+       KeyedValues result = DataUtilities.getCumulativePercentages(data);
+       assertEquals("Single value should be 100%", 1.0, result.getValue("A").doubleValue(), 0.0001);
+   }
+
+@Test
+   public void testGetCumulativePercentages_NegativeValues() {
+       DefaultKeyedValues data = new DefaultKeyedValues();
+       data.addValue("A", -2.0);
+       data.addValue("B", -3.0);
+       KeyedValues result = DataUtilities.getCumulativePercentages(data);
+       assertEquals("Cumulative % for A", -2.0 / -5.0, result.getValue("A").doubleValue(), 0.0001);
+       assertEquals("Cumulative % for B", -5.0 / -5.0, result.getValue("B").doubleValue(), 0.0001);
+   }
+
+@Test
+   public void testGetCumulativePercentages_ZeroTotal() {
+       DefaultKeyedValues data = new DefaultKeyedValues();
+       data.addValue("A", 0.0);
+       data.addValue("B", 0.0);
+       KeyedValues result = DataUtilities.getCumulativePercentages(data);
+       assertNotEquals("Cumulative % for A with zero total", 0.0, result.getValue("A").doubleValue(), 0.0001);
+       assertNotEquals("Cumulative % for B with zero total", 0.0, result.getValue("B").doubleValue(), 0.0001);
+   }
+   
+@Test
+   public void testGetCumulativePercentages_ForceUnusedLoop() {
+       DefaultKeyedValues data = new DefaultKeyedValues() {
+           @Override
+           public int getItemCount() {
+               return -1; 
+           }
+       };
+       data.addValue("A", 5.0);
+       data.addValue("B", 10.0);
+       data.addValue("C", 15.0);
+       KeyedValues result = DataUtilities.getCumulativePercentages(data);
+       assertNull("Result should not be null", result);
+       assertEquals("Cumulative percentage size should be 3", 3, result.getItemCount());
+       assertEquals("First value should be 5/(5+10+15) = 0.1667", 5.0 / 30.0, result.getValue("A").doubleValue(), 0.0001);
+       assertEquals("Second value should be (5+10)/30 = 0.5", 0.5, result.getValue("B").doubleValue(), 0.0001);
+       assertEquals("Third value should be 1.0 (100%)", 1.0, result.getValue("C").doubleValue(), 0.0001);
+   }
+
+}
+
+
+3. intersects()
+-Covered more scenarios, including overlapping and non-overlapping ranges with doubles. As a result, it covers the statement as 100% and we achieved branch coverage of 87.5% 
+
+@Test
+    public void testIntersects_WithDoubles_Intersecting() {
+        Range range = new Range(1.0, 5.0);
+        assertTrue(range.intersects(0.0, 2.0));
+        assertTrue(range.intersects(4.0, 6.0));
+        assertTrue(range.intersects(2.0, 4.0));
+        assertTrue(range.intersects(1.0, 5.0));
+    }
+
+  @Test
+    public void testIntersects_WithDoubles_NotIntersecting() {
+        Range range = new Range(1.0, 5.0);
+        assertFalse(range.intersects(0.0, 0.5));
+        assertFalse(range.intersects(5.5, 6.0));
+    }
+
+  @Test
+    public void testIntersects_WithRange_Intersecting() {
+        Range range1 = new Range(1.0, 5.0);
+        Range range2 = new Range(0.0, 2.0);
+        assertTrue(range1.intersects(range2));
+        Range range3 = new Range(4.0, 6.0);
+        assertTrue(range1.intersects(range3));
+    }
+
+  @Test
+    public void testIntersects_WithRange_NotIntersecting() {
+        Range range1 = new Range(1.0, 5.0);
+        Range range2 = new Range(0.0, 0.5);
+        assertFalse(range1.intersects(range2));
+        Range range3 = new Range(5.5, 6.0);
+        assertFalse(range1.intersects(range3));
+    }
+
+
+4. shift()
+-Used reflection to test a method. For testing this method completely and covering as a whole we used shifting with no zero crossing, allowing zero crossing. This test case ensured it functioned correctly branch coverage 100% so 100% with statement coverage as well.
+
+@Test
+    public void testShift_NoZeroCrossing() {
+        Range base = new Range(1.0, 5.0);
+        Range shifted = Range.shift(base, 2.0, false);
+        assertEquals(3.0, shifted.getLowerBound(), 0.000001);
+        assertEquals(7.0, shifted.getUpperBound(), 0.000001);
+        Range shiftedNegative = Range.shift(base, -0.5, false);
+        assertEquals(0.5, shiftedNegative.getLowerBound(), 0.000001);
+        assertEquals(4.5, shiftedNegative.getUpperBound(), 0.000001);
+        Range baseNegative = new Range(-5.0, -1.0);
+        Range shiftedNegative2 = Range.shift(baseNegative, 0.5, false);
+        assertEquals(-4.5, shiftedNegative2.getLowerBound(), 0.000001);
+        assertEquals(-0.5, shiftedNegative2.getUpperBound(), 0.000001);
+        Range shiftedToZero = Range.shift(base, -5.0, false);
+        assertEquals(0.0, shiftedToZero.getLowerBound(), 0.000001);
+        assertEquals(0.0, shiftedToZero.getUpperBound(), 0.000001);
+        Range baseZero = new Range(-1.0, 1.0);
+        Range shiftedZero = Range.shift(baseZero, -0.5, false);
+        assertEquals(0.0, shiftedZero.getLowerBound(), 0.000001);
+        assertEquals(0.5, shiftedZero.getUpperBound(), 0.000001);
+    }
+
+  @Test
+    public void testShift_AllowZeroCrossing() {
+        Range base = new Range(1.0, 5.0);
+        Range shifted = Range.shift(base, -2.0, true);
+        assertEquals(-1.0, shifted.getLowerBound(), 0.000001);
+        assertEquals(3.0, shifted.getUpperBound(), 0.000001);
+    }
+
+  @Test(expected = IllegalArgumentException.class)
+    public void testShift_NullBase() {
+          Range.shift(null, 2.0, true);
+    }
+
+5. calculateRowTotal()
+-Added edge cases for with values, empty data table, null values, large numbers , negative column count and a few more tests to cover the whole part. The folllowing code is representing the full coverage test case. The improved version of test case has statement coverage of 100% and branch coverage of 87.5%.
+
+@Test
+    public void testCalculateRowTotal_WithValues() {
+        DefaultKeyedValues2D data = new DefaultKeyedValues2D();
+        data.addValue(7.5, "Row1", "Column1");
+        data.addValue(2.5, "Row1", "Column2");
+        double result = DataUtilities.calculateRowTotal(data, 0);
+        assertEquals(10.0, result, 0.000000001d);
+    }
+
+  @Test
+    public void testCalculateRowTotal_EmptyDataTable() {
+        DefaultKeyedValues2D data = new DefaultKeyedValues2D();
+        double result = DataUtilities.calculateRowTotal(data, 0);
+        assertEquals(0.0, result, 0.000000001d);
+    }
+
+  @Test
+    public void testCalculateRowTotal_NullValue() {
+        DefaultKeyedValues2D data = new DefaultKeyedValues2D();
+        data.addValue(null, "Row1", "Column1");
+        data.addValue(2.5, "Row1", "Column2");
+        double result = DataUtilities.calculateRowTotal(data, 0);
+        assertEquals(2.5, result, 0.000000001d);
+    }
+
+  @Test
+    public void testCalculateRowTotal_LargeValues() {
+        DefaultKeyedValues2D data = new DefaultKeyedValues2D();
+        data.addValue(Double.MAX_VALUE, "Row1", "Column1");
+        data.addValue(Double.MAX_VALUE, "Row1", "Column2");
+        data.addValue(Double.MAX_VALUE, "Row1", "Column3");
+        double result = DataUtilities.calculateRowTotal(data, 0);
+        assertEquals(Double.POSITIVE_INFINITY, result, 0.000000001d);
+    }
+
+
+  @Test
+    public void testCalculateRowTotal_WithValuesAndValidCols() {
+        DefaultKeyedValues2D data = new DefaultKeyedValues2D();
+        data.addValue(1.0, "Row1", "Column1"); // col 0
+        data.addValue(2.0, "Row1", "Column2"); // col 1
+        data.addValue(3.0, "Row1", "Column3"); // col 2
+        int[] validCols = {0, 2}; // Include columns 0 and 2
+        double result = DataUtilities.calculateRowTotal(data, 0, validCols);
+        assertEquals(4.0, result, 0.0001); // 1.0 + 3.0 = 4.0
+    }
+
+
+  @Test
+    public void testCalculateRowTotal_NullValueInData() {
+        DefaultKeyedValues2D data = new DefaultKeyedValues2D();
+        data.addValue(1.0, "Row1", "Column1");
+        data.addValue(null, "Row1", "Column2");
+        data.addValue(3.0, "Row1", "Column3");
+        int[] validCols = {0, 1, 2}; // Includes the column with null
+        double result = DataUtilities.calculateRowTotal(data, 0, validCols);
+        assertEquals(4.0, result, 0.0001); // 1.0 + 3.0 = 4.0 (null is skipped)
+    }
+
+  @Test
+    public void testCalculateRowTotal_EmptyValidCols() {
+        DefaultKeyedValues2D data = new DefaultKeyedValues2D();
+        data.addValue(1.0, "Row1", "Column1");
+        data.addValue(2.0, "Row1", "Column2");
+        int[] validCols = {}; // Empty array
+        double result = DataUtilities.calculateRowTotal(data, 0, validCols);
+        assertEquals(0.0, result, 0.0001);
+    }
+
+  @Test
+    public void testCalculateRowTotal_InvalidCols() {
+        DefaultKeyedValues2D data = new DefaultKeyedValues2D();
+        data.addValue(1.0, "Row1", "Column1");
+        data.addValue(2.0, "Row1", "Column2");
+        int[] validCols = {0, 5}; // Column 5 is out of bounds
+        double result = DataUtilities.calculateRowTotal(data, 0, validCols);
+        assertEquals(1.0, result, 0.0001); // Only column 0 is counted
+    }
+
+   @Test
+    public void testCalculateRowTotal_NegativeColumnCount() {
+        DefaultKeyedValues2D data = new DefaultKeyedValues2D();
+        // Create a test data set with some values
+        data.addValue(1.0, "Row1", "Column1");
+        data.addValue(2.0, "Row1", "Column2");
+        // Test with validCols
+        int[] validCols = {0, 1};
+        double result = DataUtilities.calculateRowTotal(data, 0, validCols);
+        // Asserting that the result is 0.0 if colCount < 0
+        assertEquals(3.0, result, 0.0001);
+    }
+   
+   @Test
+   public void testCalculateRowTotal_ForceExecutionOfUnusedLoop() {
+       DefaultKeyedValues2D data = new DefaultKeyedValues2D() {
+           @Override
+           public int getColumnCount() {
+               return -2; // Forces execution of the second loop
+           }
+       };
+
+
+
+
+# 5 A detailed report of the coverage achieved of each class and method (a screen shot from the code cover results in green and red color would suffice)
+
+- DataUtilities.java
+
+![WhatsApp Image 2025-03-14 at 17 15 58](https://github.com/user-attachments/assets/317d17a5-8fc6-45a1-a15d-86ffb42f2eb1)
+![WhatsApp Image 2025-03-14 at 17 15 58 (1)](https://github.com/user-attachments/assets/c297fc6a-9b2b-4117-88fb-b5506fee427b)
+![WhatsApp Image 2025-03-14 at 17 15 58 (2)](https://github.com/user-attachments/assets/94d03941-a1f5-409b-9bdd-b2ebb1d7a41c)
+![WhatsApp Image 2025-03-14 at 17 15 59](https://github.com/user-attachments/assets/94f5e994-200d-434d-9c80-0cf6e6d62cb7)
+![WhatsApp Image 2025-03-14 at 17 15 59 (1)](https://github.com/user-attachments/assets/2a8cc8f0-3aed-478a-b067-a054bd98885d)
+![WhatsApp Image 2025-03-14 at 17 16 00](https://github.com/user-attachments/assets/71b26c31-15b3-4e21-a9bb-975263f27855)
+
+
+![WhatsApp Image 2025-03-14 at 17 17 30](https://github.com/user-attachments/assets/3e52e579-d77f-4b51-bf12-c2d4515beee8)
+![WhatsApp Image 2025-03-14 at 17 17 31](https://github.com/user-attachments/assets/b8993b19-015d-4d85-80de-606fec5ae1e0)
+
+- Range.java
+![WhatsApp Image 2025-03-14 at 17 20 31 (5)](https://github.com/user-attachments/assets/2f607039-010f-47ca-9f33-b7f1c38973ae)
+![WhatsApp Image 2025-03-14 at 17 20 31 (3)](https://github.com/user-attachments/assets/736bd03c-9dc3-4573-8a98-c134fe86fbc1)
+![WhatsApp Image 2025-03-14 at 17 20 31 (4)](https://github.com/user-attachments/assets/b80de106-6fc2-46ad-a24b-22612661febd)
+![WhatsApp Image 2025-03-14 at 17 20 31 (1)](https://github.com/user-attachments/assets/115dd0ca-6174-4f20-91b3-0295b137c6b1)
+![WhatsApp Image 2025-03-14 at 17 20 31 (2)](https://github.com/user-attachments/assets/f6a87e2c-769b-4783-abe4-6ccec6e38494)
+![WhatsApp Image 2025-03-14 at 17 20 31](https://github.com/user-attachments/assets/306634d6-73a4-493f-b5fa-6cc298835148)
+![WhatsApp Image 2025-03-14 at 17 20 30 (3)](https://github.com/user-attachments/assets/d7822749-d62b-4f21-9896-a917e3b621f4)
+![WhatsApp Image 2025-03-14 at 17 20 30](https://github.com/user-attachments/assets/85dbb78d-2661-48e4-b5e6-6e2f8eb34ce6)
+![WhatsApp Image 2025-03-14 at 17 20 30 (4)](https://github.com/user-attachments/assets/ac5bde15-edb1-4333-96f7-a584fb2d7e48)
+![WhatsApp Image 2025-03-14 at 17 20 30 (2)](https://github.com/user-attachments/assets/af4333d9-f661-4a1d-bffd-c803aa8a5e46)
+![WhatsApp Image 2025-03-14 at 17 20 30 (1)](https://github.com/user-attachments/assets/cdb43c70-9a44-479d-b3b7-02f49b60b59d)
+
+
+![WhatsApp Image 2025-03-14 at 17 21 25 (1)](https://github.com/user-attachments/assets/f5563242-9981-4f91-a26c-b062113e18e3)
+![WhatsApp Image 2025-03-14 at 17 21 25](https://github.com/user-attachments/assets/809755f8-388d-482e-a942-46c70a63d9ae)
+
+
+
+# 6 Pros and Cons of coverage tools used and Metrics you report
+
+Pros:
+
+Eclemma is easy to install and configure, and it provides a user-friendly interface that makes it easy to use.
+Eclemma provides clear and detailed coverage details for several types of coverage such as lines, branch and complexity.
+Eclemma generates automated reports that provide detailed coverage information, making it easier to track progress and identify areas for improvement.
+
+Cons:
+
+Eclemma doesn’t support condition coverage which is one of the specific types of coverage we were instructed to test
+Minor inconvenience is that everytime a coverage test is run, the folders in the coverage window close. This requires several specific folders - in the source code to be opened for the detailed percentages and other data.
+Eclemma is designed specifically for Java programming language, so it cannot be used to test code written in other languages.
+
+# 7 A comparison on the advantages and disadvantages of requirements-based test generation and coverage-based test generation.
+
+Requirements-based testing is better defined and easier to plan especially with working in a group, because test cases and conditions are gotten directly from requirements. However, it is not able to provide exhaustive testing i.e. more coverage compared to coverage-based test generation because it is scoped to just requirements. Coverage-based testing allows us determine test cases that will enable us acheive a certain coverage i.e. because coverage is subjective, we're able to deal with certain aspects of the system/object under test which leaves room for flexibility resulting in more coverage compared to requirements-based testing. The downfalls of this however is it could leave to conflicting opinions when working in a group and it is time consuming.
+
+# 8 A discussion on how the team work/effort was divided and managed
+
+We split the work evenly among the team, with three members working on meeting coverage requirements for Range (as it had more test cases), and two members working on DataUtilities. For the manual data-flow coverage calculation, each sub-team of two worked on the respective method from Range or DataUtilities. This seemed to split the workload evenly. Additionally, to fill out the lab report, all of the team members met together to work collaboratively on the document. Each member would select a section, and work on it, with edits and additional contributions to each section made by other members. We managed the workload by remaining active in our group chat and communicating with each other often and clearly.
+
+# 9 Any difficulties encountered, challenges overcome, and lessons learned from performing the lab
+
+There were some challenges encountered early on in the lab. The setup took a bit of tinkering to get the coverage framework working properly, though those challenges were overcome rather quickly. The next challenge we encountered was that EclEmma did not interact properly with our mocking framework. We therefore had to edit our testing suite to remove the mocks, and instead instantiate the objects outright. This poses a bit of an issue in terms of the rigor of the unit tests, because each test is not depending upon the correct implementation of another unit of code. Once we removed our mocks, the coverage tool began working properly. We learned a lot about the principles of white-box testing, and how to better analyze the control flow of a unit of code. We also learned how to use code coverage metrics to improve our test suite. We analyzed our original coverage, and used that information to determine where we needed to increase coverage. Additionally, we went through the manual process of calculating pair coverage which gave us a deeper understanding of how coverage tools work. White-box testing is extremely valuable in uncovering bugs that may be hidden from black-box testing, as well as unexpected behaviour that deviates from or is not mentioned in specifications.
+
+# 10 Comments/feedback on the lab itself
+
+Our group came into this lab with limited practical experience with white-box testing techniques but the lab documents explained the process very well. Giving a list of coverage tools was very helpful as well as the disclaimer that not all testing tools would be able to do everything required. This lab provided a good overview of manual data-flow coverage techniques and a good overview of using coverage values to improve a test suite. The only thing we ran into problems with in this lab was the change in documentation from the second lab. In the second lab, many of the methods explicitly stated what exceptions would be thrown so we wrote our black box tests based on the stated exceptions. However, in this lab the method documentation did not mention what exceptions would be thrown and the exceptions thrown were different from what was stated in the documentation for lab two. We decided to assume that the code was correct for this lab but this required us to rewrite some test cases from our first lab instead of being able to just migrate the test suite over.
